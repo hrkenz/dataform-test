@@ -1,0 +1,24 @@
+config {
+    type: "view",
+    schema: "sample_raw_data",
+    columns: {
+        "user_id": "ユーザーを一意に特定する ID",
+        "user_name": "ユーザー名",
+        "user_email": "ユーザーのメールアドレス",
+        "user_status": "0:利用停止中, 1:利用中, 2:削除済み",
+        "user_created_at": "ユーザーが作成された日時",
+        "user_updated_at": "ユーザーの情報が更新された日時",
+        "user_deleted_at": "ユーザーが削除された日時",
+    }
+}
+
+select
+    user_id
+    , user_name
+    , user_email
+    , user_status
+    , user_created_at
+    , user_updated_at
+    , user_deleted_at
+from
+    sample_raw_data.sample_user
