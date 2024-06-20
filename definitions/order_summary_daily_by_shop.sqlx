@@ -1,0 +1,28 @@
+config {
+    type: "incremental",
+    uniqueKey: ["order_shop_id", "order_date"], // shop ごとに daily の件数をカウントするサマリテーブルなので
+    bigquery: {
+        partitionBy: "order_date",
+        updatePartitionFilter:
+            "order_date >= date_trunc(date_sub(current_date(), interval 1 month), month)" // 一旦先月分以降の partition を見るようにしておく
+    },
+    schema: "sample_raw_data",
+    columns: {
+        "order_shop_id": "店舗を一意に特定する ID",
+        "order_count": "注文数",
+        "order_date": "注文日",
+    }
+}
+
+select
+    order_shop_id
+    , count(1) as order_count
+    , date(order_created_at) as order_date
+from
+    sample_raw_data.sample_order
+
+-- ここはよい書き方ではないと思うがテストなので : max(partition) しちゃうとそれすなわちフルスキャンでは
+${ when(incremental(), `where date(order_created_at) >= (select max(order_date) from ${self()})`) }
+
+group by
+    1, 3
